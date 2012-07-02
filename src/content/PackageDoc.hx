@@ -11,7 +11,15 @@ class PackageDoc
 	/** List of classes contained by this package. */
 	public var classes : Array<ClassDoc>;
 	
+	/** List of methods defined in this package. */
+	public var methods : Array<MethodDoc>;
+	
+	/** List of properties defined in this package. */
+	public var properties : Array<PropertyDoc>;
+	
 	public function new() {
 		this.classes = [];
+		this.methods = [];
+		this.properties = [];
 	}
 }

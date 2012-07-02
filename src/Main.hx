@@ -1,3 +1,4 @@
+import content.PackageDoc;
 import haxe.Http;
 import neko.Lib;
 using StringTools;
@@ -24,39 +25,40 @@ class Main
 		return "en_US";
 	}
 	
+	/** Path to NME source code. */
+	private static inline function NME_SOURCE() {
+		return "D:\\svn\\nekonme-read-only";
+	}
+	
 	/**
 	 * Entry point of the documentor.
 	 */
 	public static function main() 
 	{
-		// Generates the full documentation index URL.
+		// Configuring the proxy for HTTP access.
+		Http.PROXY = { host: "lil-net-proxy.ubisoft.org", port: 3128, auth: null };
+		
+		// Get an index of all available documentation.
 		var url = DOCUMENTATION_URL().replace("%LOCALE%", DOCUMENTATION_LOCALE()) + "/packages.dita";
 		//var indexer = new DocIndexer(url);
 		//var indexer = ["http://opensource.adobe.com/svn/opensource/flex/sdk/trunk/frameworks/projects/playerglobal/bundles/en_US/docs/__Global__.xml"];
-		var indexer = ["http://opensource.adobe.com/svn/opensource/flex/sdk/trunk/frameworks/projects/playerglobal/bundles/en_US/docs/flash.sensors.xml"];
+		var indexer = ["http://opensource.adobe.com/svn/opensource/flex/sdk/trunk/frameworks/projects/playerglobal/bundles/en_US/docs/flash.errors.xml"];
 		
-		// Fetch each page.
-		indexer.iter(fetch);
+		// Fetch all that documentation.
+		var docs : Array<PackageDoc> = [];
+		indexer.iter(callback(fetch, docs));
+		
+		// Browse the NME source code to fill the documentation.
+		// TODO :)
 	}
 	
-	private static function fetch(url : String)
+	private static function fetch(docs : Array<PackageDoc>, url : String) : Void
 	{
 		// Extracting the package name.
 		var pack = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
 		Lib.println("Fetching documentation for package " + pack + "...");
 		
-		// Parse the data.
-		DocParser.parseFromUrl(url);
-		//trace(Http.requestUrl(url));
-	}
-	
-	/**
-	 * Displays usage information and copyright.
-	 */
-	private static function printNotice()
-	{
-		Lib.println("NME Documentor " + VERSION() + " - (c)2012 Samuel Loretan");
-		Lib.println(" Options:");
-		Lib.println("  -");
+		// Download and parse the data.
+		docs.push(DocParser.parseFromUrl(url));
 	}
 }

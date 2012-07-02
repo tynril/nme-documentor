@@ -19,8 +19,20 @@ class ClassDoc
 	
 	/** List of events that this class can dispatch. */
 	public var events : Array<EventDoc>;
+	
+	/** List of class constructors. */
+	public var constructors : Array<MethodDoc>;
+	
+	/** List of class methods. */
+	public var methods : Array<MethodDoc>;
+	
+	/** List of class properties. */
+	public var properties : Array<PropertyDoc>;
 
 	public function new() {
 		this.events = [];
+		this.constructors = [];
+		this.methods = [];
+		this.properties = [];
 	}
 }
