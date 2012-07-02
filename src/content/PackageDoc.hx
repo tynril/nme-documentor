@@ -1,4 +1,5 @@
 package content;
+using Lambda;
 
 /**
  * Documentation about a package and its content.
@@ -21,5 +22,16 @@ class PackageDoc
 		this.classes = [];
 		this.methods = [];
 		this.properties = [];
+	}
+	
+	/**
+	 * Gets the documentation for a given class inside this package.
+	 */
+	public function getClassDoc(className : String) : ClassDoc
+	{
+		return classes.filter(function(doc : ClassDoc) : Bool {
+			if (doc.name == className) return true;
+			return false;
+		}).first();
 	}
 }

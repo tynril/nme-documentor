@@ -1,4 +1,5 @@
 package content;
+using Lambda;
 
 /**
  * Documentation about a specific class.
@@ -20,8 +21,8 @@ class ClassDoc
 	/** List of events that this class can dispatch. */
 	public var events : Array<EventDoc>;
 	
-	/** List of class constructors. */
-	public var constructors : Array<MethodDoc>;
+	/** Class constructor method. */
+	public var constructor : MethodDoc;
 	
 	/** List of class methods. */
 	public var methods : Array<MethodDoc>;
@@ -31,8 +32,29 @@ class ClassDoc
 
 	public function new() {
 		this.events = [];
-		this.constructors = [];
 		this.methods = [];
 		this.properties = [];
+	}
+	
+	/**
+	 * Gets the documentation for a given method inside this class.
+	 */
+	public function getMethodDoc(methodName : String) : MethodDoc
+	{
+		return methods.filter(function(doc : MethodDoc) : Bool {
+			if (doc.name == methodName) return true;
+			return false;
+		}).first();
+	}
+	
+	/**
+	 * Gets the documentation for a given property inside this class.
+	 */
+	public function getPropertyDoc(propertyName : String) : PropertyDoc
+	{
+		return properties.filter(function(doc : PropertyDoc) : Bool {
+			if (doc.name == propertyName) return true;
+			return false;
+		}).first();
 	}
 }

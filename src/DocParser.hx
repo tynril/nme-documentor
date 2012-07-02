@@ -33,6 +33,11 @@ class DocParser
 			case "apiName":
 				// Package name.
 				pack.name = data.firstChild().toString().trim();
+				
+				// Special case for the global package.
+				if (pack.name == "__Global__") {
+					pack.name = "";
+				}
 			case "apiDetail":
 				// Details about the package (usually empty).
 			case "apiClassifier":
@@ -87,10 +92,11 @@ class DocParser
 				clazz.events.push(eventDoc);
 			case "apiConstructor":
 				// Constructor for that class.
+				// There might be multiple, but only in edge cases we don't care about.
 				var constructorDoc = new MethodDoc();
 				constructorDoc.clazz = clazz;
 				data.iter(callback(parseConstructor, constructorDoc));
-				clazz.constructors.push(constructorDoc);
+				clazz.constructor = constructorDoc;
 			case "apiOperation":
 				// Method on that class.
 				var methodDoc = new MethodDoc();
@@ -595,6 +601,7 @@ class DocParser
 	
 	/**
 	 * Parse a description, as described in the 'apiDesc' element.
+	 * <table><tr><td>lol</td><td>lil</td></tr><tr><td>lul</td><td>lal</td></tr></table>
 	 */
 	private static function parseDescription(data : Xml) : String
 	{
@@ -605,11 +612,58 @@ class DocParser
 		// Remove XML 'class' arguments.
 		desc = ~/ class="[^"]+"/gi.replace(desc, "");
 		
-		// Replace 'codeph' element by 'tt'.
-		desc = ~/<(\/?)codeph/gi.replace(desc, "<$1tt");
+		// Replace 'codeph' element by 'code'.
+		desc = ~/<(\/?)codeph/gi.replace(desc, "<$1code");
 		
 		// Replace 'xref' element by 'a'.
 		desc = ~/<(\/?)xref/gi.replace(desc, "<$1a");
+		
+		// Remove images.
+		desc = ~/<adobeimage[^>]*\/>/g.replace(desc, "");
+		
+		// Remove tables.
+		desc = ~/<adobetable>.*<\/adobetable>/gs.replace(desc, "");
+		
+		// Remove codeblocks.
+		desc = ~/<codeblock.*<\/codeblock>/gs.replace(desc, "");
+		
+		// Process HTML entities.
+		desc = desc.htmlUnescape();
+		
+		// Replace tabs by spaces.
+		desc = ~/\t/g.replace(desc, " ");
+		
+		// Remove line breaks.
+		desc = ~/\n/g.replace(desc, " ");
+		
+		// Replace multiple spaces by single space.
+		desc = ~/[ ]+/g.replace(desc, " ");
+		
+		// Remove empty paragraphs.
+		desc = ~/<p>\s*<\/p>/g.replace(desc, " ");
+		
+		// Put line breaks before and after paragraphs.
+		desc = ~/<p>/g.replace(desc, "\n<p>");
+		desc = ~/<\/p>/g.replace(desc, "</p>\n");
+		
+		// Format lists
+		desc = ~/<(ul|ol|li)>/g.replace(desc, "\n<$1>");
+		desc = ~/<\/(ul|ol|li)>/g.replace(desc, "</$1>\n");
+		
+		// Remove leading spaces.
+		desc = ~/\n+/g.replace(desc, "\n");
+		desc = ~/^[ ]*(.*)[ ]*$/gm.replace(desc, "$1");
+		
+		// Indent list elements.
+		desc = ~/<li>/g.replace(desc, "  <li>");
+		
+		// Put proper separation between paragraphs.
+		desc = ~/<p>/g.replace(desc, "\n<p>");
+		desc = ~/\n\n+/g.replace(desc, "\n\n");
+		
+		// Trim the whole stuff.
+		desc = desc.trim();
+		
 		return desc;
 	}
 }
