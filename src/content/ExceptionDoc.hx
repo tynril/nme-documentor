@@ -5,12 +5,6 @@ package content;
  */
 class ExceptionDoc 
 {
-	/** Method that can raise this exception. */
-	public var method : MethodDoc;
-	
-	/** Property that can raise this exception. */
-	public var property : PropertyDoc;
-	
 	/** Exception name. */
 	public var name : String;
 	

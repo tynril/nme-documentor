@@ -5,12 +5,6 @@ package content;
  */
 class MethodDoc 
 {
-	/** Class that owns that method. */
-	public var clazz : ClassDoc;
-	
-	/** Package that owns that method. */
-	public var pack : PackageDoc;
-	
 	/** Name of the method. */
 	public var name : String;
 	

@@ -6,9 +6,6 @@ using Lambda;
  */
 class ClassDoc 
 {
-	/** Package in which this class remains. */
-	public var pack : PackageDoc;
-	
 	/** Name of the class. */
 	public var name : String;
 	

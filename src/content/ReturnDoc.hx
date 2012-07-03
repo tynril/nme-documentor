@@ -5,9 +5,6 @@ package content;
  */
 class ReturnDoc 
 {
-	/** Method this return type belongs to. */
-	public var method : MethodDoc;
-	
 	/** Description of the return. */
 	public var description : String;
 	

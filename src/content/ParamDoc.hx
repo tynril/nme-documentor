@@ -5,9 +5,6 @@ package content;
  */
 class ParamDoc 
 {
-	/** Method this parameter belongs to. */
-	public var method : MethodDoc;
-	
 	/** Parameter name. */
 	public var name : String;
 	

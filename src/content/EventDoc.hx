@@ -5,12 +5,6 @@ package content;
  */
 class EventDoc 
 {
-	/** Class that can dispatch that event. */
-	public var clazz : ClassDoc;
-	
-	/** Method that can dispatch that event. */
-	public var method : MethodDoc;
-	
 	/** Name of the event. */
 	public var name : String;
 	

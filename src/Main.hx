@@ -1,5 +1,6 @@
 import content.MethodDoc;
 import content.PackageDoc;
+import content.ParamDoc;
 import content.PropertyDoc;
 import haxe.Http;
 import neko.FileSystem;
@@ -240,11 +241,25 @@ class Main
 						if (_verbose)
 							Lib.println("    Adding documentation to class " + className + "...");
 						
+						// Opening documentation block.
 						output.writeLine(indent + "/**");
-						output.writeDocParagraph(indent + " * ", currentClass.fullDesc);
-						output.writeLine(indent + " */");
 						
-						// TODO: Output dispatched events.
+						// Displaying class description.
+						output.writeDocParagraph(indent + " * ", currentClass.fullDesc);
+						
+						// Displaying dispatched events.
+						var hadSeparator = false;
+						if(currentClass.events.length > 0)
+						{
+							if (!hadSeparator) {
+								output.writeLine(indent + " * ");
+								hadSeparator = true;
+							}
+							output.writeDocEvent(indent, currentClass.events);
+						}
+						
+						// Closing documentation block.
+						output.writeLine(indent + " */");
 						
 						isUndocumentedClass = false;
 					}
@@ -280,36 +295,65 @@ class Main
 						if (_verbose)
 							Lib.println("      Adding documentation to method " + methodName + "...");
 						
+						// Starting documentation block.
 						output.writeLine();
 						output.writeLine(indent + "/**");
+						
+						// Displaying deprecation status.
+						if (methodDoc.isDeprecated) {
+							output.writeLine(indent + " * @deprecated");
+							output.writeLine();
+						}
+						
+						// Displaying the method description.
 						output.writeDocParagraph(indent + " * ", methodDoc.fullDesc);
 						
 						// Displaying parameters documentation.
-						var hadParam = false;
-						for (param in methodDoc.parameters)
-						{
-							// Only display params that the method has.
-							if (methodParams.has(param.name)) {
+						var hadSeparator = false;
+						if (methodDoc.parameters.length > 0) {
+							// Filter parameters to keep only those that the method has.
+							var params = methodDoc.parameters.filter(function(doc : ParamDoc) : Bool { return methodParams.has(doc.name); } );
+							
+							if (params.length > 0) {
 								// Add a separator before the parameters.
-								if (!hadParam) {
+								if (!hadSeparator) {
 									output.writeLine(indent + " * ");
-									hadParam = true;
+									hadSeparator = true;
 								}
-								output.writeDocParam(indent, param);
-							}
-							else {
-								trace("Warning: unknown parameter " + param.name + " in method " + methodName + ".");
+								output.writeDocParams(indent, params);
 							}
 						}
 						
 						// Displaying return documentation.
-						if(methodDoc.returnVal != null)
+						if (methodDoc.returnVal != null) {
+							if (!hadSeparator) {
+								output.writeLine(indent + " * ");
+								hadSeparator = true;
+							}
 							output.writeDocReturn(indent, methodDoc.returnVal);
+						}
 						
-						// TODO: Output throwable exceptions.
-						// TODO: Output deprecated status.
-						// TODO: Output dispatched events.
+						// Displaying throwable exceptions.
+						if(methodDoc.exceptions.length > 0)
+						{
+							if (!hadSeparator) {
+								output.writeLine(indent + " * ");
+								hadSeparator = true;
+							}
+							output.writeDocThrows(indent, methodDoc.exceptions);
+						}
 						
+						// Displaying dispatched events.
+						if(methodDoc.events.length > 0)
+						{
+							if (!hadSeparator) {
+								output.writeLine(indent + " * ");
+								hadSeparator = true;
+							}
+							output.writeDocEvent(indent, methodDoc.events);
+						}
+						
+						// Closing the documentation block.
 						output.writeLine(indent + " */");
 					}
 				}
@@ -339,13 +383,40 @@ class Main
 						if (_verbose)
 							Lib.println("      Adding documentation to property " + propertyName + "...");
 						
+						// Starting documentation block.
 						output.writeLine();
 						output.writeLine(indent + "/**");
+						
+						// Displaying deprecation status.
+						if (propertyDoc.isDeprecated) {
+							output.writeLine(indent + " * @deprecated");
+							output.writeLine();
+						}
+						
+						// Displaying property description.
 						output.writeDocParagraph(indent + " * ", propertyDoc.fullDesc);
 						
-						// TODO: Output throwable exceptions.
-						// TODO: Output deprecated status.
+						// Displaying default value.
+						var hadSeparator = false;
+						if (propertyDoc.defaultValue != null) {
+							if (!hadSeparator) {
+								output.writeLine(indent + " * ");
+								hadSeparator = true;
+							}
+							output.writeDocDefault(indent, propertyDoc.defaultValue);
+						}
 						
+						// Displaying throwable exceptions.
+						if (propertyDoc.exceptions.length > 0)
+						{
+							if (!hadSeparator) {
+								output.writeLine(indent + " * ");
+								hadSeparator = true;
+							}
+							output.writeDocThrows(indent, propertyDoc.exceptions);
+						}
+						
+						// Closing documentation block.
 						output.writeLine(indent + " */");
 					}
 				}

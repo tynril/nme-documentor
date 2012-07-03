@@ -5,12 +5,6 @@ package content;
  */
 class PropertyDoc 
 {
-	/** Class on which this property is bound. */
-	public var clazz : ClassDoc;
-	
-	/** Package on which this property is bound. */
-	public var pack : PackageDoc;
-	
 	/** Name of that property. */
 	public var name : String;
 	
@@ -41,8 +35,11 @@ class PropertyDoc
 	/** Exceptions that can be raised when calling that property. */
 	public var exceptions : Array<ExceptionDoc>;
 	
-	/** Default or constant value of the property. */
-	public var data : String;
+	/** Constant value of the property. */
+	public var constantValue : String;
+	
+	/** Default value of the property. */
+	public var defaultValue : String;
 
 	public function new() {
 		this.exceptions = [];

@@ -43,19 +43,16 @@ class DocParser
 			case "apiClassifier":
 				// Describes a class contained in this package.
 				var classDoc = new ClassDoc();
-				classDoc.pack = pack;
 				data.iter(callback(parseClass, classDoc));
 				pack.classes.push(classDoc);
 			case "apiOperation":
 				// Describes a global function contained in this package.
 				var methodDoc = new MethodDoc();
-				methodDoc.pack = pack;
 				data.iter(callback(parseMethod, methodDoc));
 				pack.methods.push(methodDoc);
 			case "apiValue":
 				// Describes a global constant contained in this package.
 				var propDoc = new PropertyDoc();
-				propDoc.pack = pack;
 				data.iter(callback(parseProperty, propDoc));
 				pack.properties.push(propDoc);
 			default:
@@ -87,26 +84,22 @@ class DocParser
 			case "adobeApiEvent":
 				// Event that can be dispatched by that class.
 				var eventDoc = new EventDoc();
-				eventDoc.clazz = clazz;
 				data.iter(callback(parseEvent, eventDoc));
 				clazz.events.push(eventDoc);
 			case "apiConstructor":
 				// Constructor for that class.
 				// There might be multiple, but only in edge cases we don't care about.
 				var constructorDoc = new MethodDoc();
-				constructorDoc.clazz = clazz;
 				data.iter(callback(parseConstructor, constructorDoc));
 				clazz.constructor = constructorDoc;
 			case "apiOperation":
 				// Method on that class.
 				var methodDoc = new MethodDoc();
-				methodDoc.clazz = clazz;
 				data.iter(callback(parseMethod, methodDoc));
 				clazz.methods.push(methodDoc);
 			case "apiValue":
 				// Property on that class.
 				var propDoc = new PropertyDoc();
-				propDoc.clazz = clazz;
 				data.iter(callback(parseProperty, propDoc));
 				clazz.properties.push(propDoc);
 			default:
@@ -195,8 +188,9 @@ class DocParser
 				event.type = data.firstChild().toString().trim();
 			case "adobeApiEventClassifier":
 				// Class of the event.
-				if(data.firstChild() != null)
+				if(data.firstChild() != null) {
 					event.typeClass = data.firstChild().toString().trim();
+				}
 			case "apiGeneratedEvent":
 				// Unknown
 			case "apiDefinedEvent":
@@ -232,7 +226,6 @@ class DocParser
 			case "adobeApiEvent":
 				// Event that can be dispatched by that constructor.
 				var eventDoc = new EventDoc();
-				eventDoc.method = constructor;
 				data.iter(callback(parseEvent, eventDoc));
 				constructor.events.push(eventDoc);
 			default:
@@ -275,13 +268,11 @@ class DocParser
 			case "apiParam":
 				// Parameter of that constructor.
 				var paramDoc : ParamDoc = new ParamDoc();
-				paramDoc.method = constructor;
 				data.iter(callback(parseParam, paramDoc));
 				constructor.parameters.push(paramDoc);
 			case "apiException":
 				// Exception that can be raised when calling this constructor.
 				var exceptionDoc : ExceptionDoc = new ExceptionDoc();
-				exceptionDoc.method = constructor;
 				data.iter(callback(parseException, exceptionDoc));
 				constructor.exceptions.push(exceptionDoc);
 			case "apiTipTexts":
@@ -313,7 +304,6 @@ class DocParser
 			case "adobeApiEvent":
 				// Event that can be dispatched by that method.
 				var eventDoc = new EventDoc();
-				eventDoc.method = method;
 				data.iter(callback(parseEvent, eventDoc));
 				method.events.push(eventDoc);
 			case "related-links":
@@ -358,13 +348,11 @@ class DocParser
 			case "apiException":
 				// Exception that can be raised by that method.
 				var exceptionDoc : ExceptionDoc = new ExceptionDoc();
-				exceptionDoc.method = method;
 				data.iter(callback(parseException, exceptionDoc));
 				method.exceptions.push(exceptionDoc);
 			case "apiReturn":
 				// Return type of the method.
 				var returnDoc : ReturnDoc = new ReturnDoc();
-				returnDoc.method = method;
 				data.iter(callback(parseReturn, returnDoc));
 				if (method.returnVal != null)
 					throw "A return value was already bound to the method.";
@@ -372,7 +360,6 @@ class DocParser
 			case "apiParam":
 				// Parameter of that method.
 				var paramDoc : ParamDoc = new ParamDoc();
-				paramDoc.method = method;
 				data.iter(callback(parseParam, paramDoc));
 				method.parameters.push(paramDoc);
 			case "apiTipTexts":
@@ -572,20 +559,17 @@ class DocParser
 			case "apiException":
 				// Exception that can be raised when calling this property.
 				var exceptionDoc : ExceptionDoc = new ExceptionDoc();
-				exceptionDoc.property = property;
 				data.iter(callback(parseException, exceptionDoc));
 				property.exceptions.push(exceptionDoc);
 			case "apiData":
 				// Constant value of that property.
 				if (data.firstChild() != null) {
-					if (property.data == null) {
-						property.data = data.firstChild().toString().trim();
-					}
+					property.constantValue = data.firstChild().toString().trim();
 				}
 			case "apiDefaultValue":
 				// Default value of that property.
 				if (data.firstChild() != null) {
-					property.data = data.firstChild().toString().trim();
+					property.defaultValue = data.firstChild().toString().trim();
 				}
 			case "apiTipTexts":
 				// Tips associated with this property.
@@ -617,6 +601,9 @@ class DocParser
 		
 		// Replace 'xref' element by 'a'.
 		desc = ~/<(\/?)xref/gi.replace(desc, "<$1a");
+		
+		// Remove 'ph' tags.
+		desc = ~/<\/?ph>/g.replace(desc, "");
 		
 		// Remove images.
 		desc = ~/<adobeimage[^>]*\/>/g.replace(desc, "");
